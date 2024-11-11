@@ -68,7 +68,7 @@ public class ProvarExcel {
                    Cell cell = row.createCell(index.getAndIncrement());
                    cell.setCellValue(header);
                });
-               // Add this part to append data to "Master_Modules" column after headers are added
+               // Add module data to "Master_Modules" column
                int masterModulesColIndex = -1;
                for (Cell cell : row) {
                    if (cell.getStringCellValue().equalsIgnoreCase("Master_Modules")) {
@@ -88,11 +88,49 @@ public class ProvarExcel {
                } else {
                    System.out.println("Master_Modules column not found in ProvarExcel.xlsx");
                }
+               // Find the row with "Pre Header" and add "ps", "ssl", and "vo" under "Master_Elements"
+               int preHeaderRowIndex = -1;
+               for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                   Row currentRow = sheet.getRow(i);
+                   if (currentRow != null) {
+                       for (Cell cell : currentRow) {
+                           if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equalsIgnoreCase("Pre Header")) {
+                               preHeaderRowIndex = currentRow.getRowNum();
+                               break;
+                           }
+                       }
+                   }
+                   if (preHeaderRowIndex != -1) {
+                       break;
+                   }
+               }
+               int masterElementsColIndex = -1;
+               for (Cell cell : row) {
+                   if (cell.getStringCellValue().equalsIgnoreCase("Master_Elements")) {
+                       masterElementsColIndex = cell.getColumnIndex();
+                       break;
+                   }
+               }
+               if (preHeaderRowIndex != -1 && masterElementsColIndex != -1) {
+                   // Add "ps" in the same row as "Pre Header"
+                   Row preHeaderRow = sheet.getRow(preHeaderRowIndex);
+                   Cell psCell = preHeaderRow.createCell(masterElementsColIndex);
+                   psCell.setCellValue("ps");
+                   // Add "ssl" and "vo" in the rows below
+                   Row sslRow = sheet.createRow(preHeaderRowIndex + 1);
+                   Cell sslCell = sslRow.createCell(masterElementsColIndex);
+                   sslCell.setCellValue("ssl");
+                   Row voRow = sheet.createRow(preHeaderRowIndex + 2);
+                   Cell voCell = voRow.createCell(masterElementsColIndex);
+                   voCell.setCellValue("vo");
+               } else {
+                   System.out.println("Pre Header row or Master_Elements column not found.");
+               }
            }
        }
        try (FileOutputStream fos = new FileOutputStream("ProvarExcel.xlsx")) {
            workbook.write(fos);
-           System.out.println("Excel file created successfully with Master_Modules data");
+           System.out.println("Excel file created successfully with Master_Modules and Pre Header data");
        } catch (IOException e) {
            e.printStackTrace();
        }
