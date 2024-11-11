@@ -88,20 +88,17 @@ public class ProvarExcel {
                } else {
                    System.out.println("Master_Modules column not found in ProvarExcel.xlsx");
                }
-               // Find the row with "Pre Header" and add "ps", "ssl", and "vo" under "Master_Elements"
+               // Add "ps", "ssl", and "vo" under "Master_Elements" for the "Pre Header" section
                int preHeaderRowIndex = -1;
                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                    Row currentRow = sheet.getRow(i);
                    if (currentRow != null) {
-                       for (Cell cell : currentRow) {
-                           if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equalsIgnoreCase("Pre Header")) {
-                               preHeaderRowIndex = currentRow.getRowNum();
-                               break;
-                           }
+                       Cell moduleCell = currentRow.getCell(masterModulesColIndex);
+                       if (moduleCell != null && moduleCell.getCellType() == CellType.STRING &&
+                               moduleCell.getStringCellValue().equalsIgnoreCase("Pre Header")) {
+                           preHeaderRowIndex = currentRow.getRowNum();
+                           break;
                        }
-                   }
-                   if (preHeaderRowIndex != -1) {
-                       break;
                    }
                }
                int masterElementsColIndex = -1;
@@ -126,11 +123,48 @@ public class ProvarExcel {
                } else {
                    System.out.println("Pre Header row or Master_Elements column not found.");
                }
+               // Populate SG_EN Content for "Subject Line"
+               int sgEnContentColIndex = -1;
+               for (Cell cell : row) {
+                   if (cell.getStringCellValue().equalsIgnoreCase("SG-EN_Content")) {
+                       sgEnContentColIndex = cell.getColumnIndex();
+                       break;
+                   }
+               }
+               if (sgEnContentColIndex != -1) {
+                   for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                       Row currentRow = sheet.getRow(i);
+                       if (currentRow != null) {
+                           Cell masterModuleCell = currentRow.getCell(masterModulesColIndex);
+                           if (masterModuleCell != null && masterModuleCell.getCellType() == CellType.STRING &&
+                                   masterModuleCell.getStringCellValue().equalsIgnoreCase("Subject Line")) {
+                               // Find the corresponding row in the source sheet
+                               for (int j = 5; j <= sourceSheet.getLastRowNum(); j++) {
+                                   Row sourceRow = sourceSheet.getRow(j);
+                                   if (sourceRow != null) {
+                                       Cell moduleCell = sourceRow.getCell(reqcolindex);
+                                       if (moduleCell != null && moduleCell.getCellType() == CellType.STRING &&
+                                               moduleCell.getStringCellValue().equalsIgnoreCase("Subject Line")) {
+                                           Cell contentCell = sourceRow.getCell(4); // Assuming E column is index 4
+                                           if (contentCell != null && contentCell.getCellType() == CellType.STRING) {
+                                               Cell sgEnContentCell = currentRow.createCell(sgEnContentColIndex);
+                                               sgEnContentCell.setCellValue(contentCell.getStringCellValue());
+                                           }
+                                           break;
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }
+               } else {
+                   System.out.println("SG_EN Content column not found in ProvarExcel.xlsx");
+               }
            }
        }
        try (FileOutputStream fos = new FileOutputStream("ProvarExcel.xlsx")) {
            workbook.write(fos);
-           System.out.println("Excel file created successfully with Master_Modules and Pre Header data");
+           System.out.println("Excel file updated successfully with SG_EN Content and 'Pre Header' section data");
        } catch (IOException e) {
            e.printStackTrace();
        }
