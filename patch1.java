@@ -1,43 +1,19 @@
- String preHeaderContent = "";
-           for (int i = 5; i <= sourceSheet.getLastRowNum(); i++) {
-               Row sourceRow = sourceSheet.getRow(i);
-               if (sourceRow != null) {
-                   Cell moduleCell = sourceRow.getCell(reqcolindex);
-                   System.out.println("MODULE CELL" +moduleCell);
-                   if (moduleCell != null && moduleCell.getCellType() == CellType.STRING &&
-                           moduleCell.getStringCellValue().equalsIgnoreCase("Pre Header")) {
-                       // Get the content from column E (index 4)
-                       Cell contentCell = sourceRow.getCell(4);
-                       System.out.println("PREHEADER CONTENT" +contentCell); // Assuming column E contains the content
-                       if (contentCell != null && contentCell.getCellType() == CellType.STRING) {
-                           preHeaderContent = contentCell.getStringCellValue();
-                       }
-                       break;
-                   }
-               }
-           }
+// Add "ps", "ssl", and "vo" under "Master_Elements" for the "Pre Header" section
+if (preHeaderRowIndex != -1 && masterElementsColIndex != -1) {
+    // Add "ps" in the same row as "Pre Header"
+    Row preHeaderRow = sheet.getRow(preHeaderRowIndex);
+    Cell psCell = preHeaderRow.createCell(masterElementsColIndex);
+    psCell.setCellValue("ps");
 
-              // Now populate SG_EN Content for "ssl" with the fetched Pre Header content
-              if (preHeaderContent != null && !preHeaderContent.isEmpty()) {
-                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                    Row currentRow = sheet.getRow(i);
-                    if (currentRow != null) {
-                        Cell masterElementCell = currentRow.getCell(masterElementsColIndex);
-                        if (masterElementCell != null && masterElementCell.getCellType() == CellType.STRING &&
-                        masterElementCell.getStringCellValue().equalsIgnoreCase("ssl")) {
-                            // Set SG_EN Content for "ssl"
-                            
-                            for (Cell cell : row) {
-                                if (cell.getStringCellValue().equalsIgnoreCase("SG_EN Content")) {
-                                    sgEnContentColIndex = cell.getColumnIndex();
-                                    break;
-                                }
-                            }
-                            if (sgEnContentColIndex != -1) {
-                                Cell sgEnContentCell = currentRow.createCell(sgEnContentColIndex);
-                                sgEnContentCell.setCellValue(preHeaderContent);
-                            }
-                        }
-                    }
-                }
-            }
+    // Shift rows below the "Pre Header" row down by 2 positions to make room for "ssl" and "vo"
+    sheet.shiftRows(preHeaderRowIndex + 1, sheet.getLastRowNum(), 2);
+
+    // Add "ssl" and "vo" in the rows below
+    Row sslRow = sheet.createRow(preHeaderRowIndex + 1);
+    Cell sslCell = sslRow.createCell(masterElementsColIndex);
+    sslCell.setCellValue("ssl");
+
+    Row voRow = sheet.createRow(preHeaderRowIndex + 2);
+    Cell voCell = voRow.createCell(masterElementsColIndex);
+    voCell.setCellValue("vo");
+}
