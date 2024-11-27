@@ -10,65 +10,72 @@ public class P21Handler {
         int masterModulesColIndex = ExcelUtils.getColumnIndex(sheet, "Master_Modules");
         int masterElementsColIndex = ExcelUtils.getColumnIndex(sheet, "Master_Elements");
         
-        String moduleValue = "P2.1.1 - Left aligned primary copy module with background colour options";
+        String moduleValue ="P2.1.1 - Left aligned primary copy module with background colour options";
         
-        int moduleRowIndex = findModuleRow(sheet, moduleValue, masterModulesColIndex);
+        int moduleRowIndex= findModuleByName(sheet,moduleValue);
 
-        if (moduleRowIndex != -1 && masterElementsColIndex != -1) {
-            Row moduleRow = sheet.getRow(moduleRowIndex);
-            Cell headingCell = moduleRow.createCell(masterElementsColIndex);
-            headingCell.setCellValue("heading");
+       if(modulerowindex!=-1&&masterelementscolindex!=-1){
+           Row modulrow=sheet.Getrow(modulerowindex);
+           Cell headingcell=modulrow.Createcell(masterelementscolindex);
+           headingcell.Setcellvalue("heading");
 
-            // Shift rows down to make room for body copy and CTA button
-            sheet.shiftRows(moduleRowIndex + 1, sheet.getLastRowNum(), 2);
+           // Shift rows below the P2.1.1 row down by two positions to make room for body copy and CTA button.
+           sheet.shiftRows(modulerowindex+1,sheet.Getlastrownum(),2);
 
-            Row bodyCopyRow = sheet.createRow(moduleRowIndex + 1);
-            bodyCopyRow.createCell(masterElementsColIndex).setCellValue("bodycopy");
+           Row bodycopyrow=sheet.Createrow(modulerowindex+1);
+           bodycopyrow.Createcell(masterelementscolindex).Setcellvalue("bodycopy");
 
-            Row ctaButtonRow = sheet.createRow(moduleRowIndex + 2);
-            ctaButtonRow.createCell(masterElementsColIndex).setCellValue("CTAbutton");
+           Row ctbuttonrow=sheet.Createrow(modulerowindex+2);
+           ctbuttonrow.Createcell(masterelementscolindex).Setcellvalue("CTAbutton");
 
-            populateP21Content(sourceWorkbook, moduleValue, moduleRow, headingCell);
-        }
-    }
+           populateP21Content(sourceWorkbook,moduleValue,modulerow,headingcell);
 
-    private static void populateP21Content(Workbook sourceWorkbook, String moduleValue, Row moduleRow, Cell heading) {
-        Sheet sourceSheet = sourceWorkbook.getSheet("EMAIL 1");
-        
-        for (int i = 5; i <= sourceSheet.getLastRowNum(); i++) { // Start from row index where data begins
-            Row sourceDataRow = sourceSheet.getRow(i);
-            if (sourceDataRow != null) {
-                Cell moduleNameInSource = sourceDataRow.getCell(0); // Assuming MODULES is in column A
+       }
 
-                if (moduleNameInSource != null && moduleNameInSource.getStringCellValue().equalsIgnoreCase(moduleValue)) {
+   }
 
-                    // Fetch content from E column for heading and body copy
-                    String headingContent =
-                            getStringFromSource(sourceDataRow, 4); // Column E index is 4
+   private static void populateP21Content(Workbook sourceWorkbook,String moduleValue,row modulrow){
+       Sheet sourcesheet=sourceworkbook.Getsheet("EMAIL 1");
+       
+       for(int i=5;i<=sourcesheet.Getlastrownum();i++){ 
+          Row sourcedatarow=sourcesheet.Getrow(i); 
+          if(sourcedatarow!=null){ 
+             Cell modulenameinsourcedata=sourcedatarow.Getcell(0); 
 
-                    heading.setStringValue(headingContent);
+             if(modulenameinsourcedata!=null&&modulenameinsourcedata.Getstringcellvalue().equalsIgnoreCase(modulevalue)){ 
 
-                    break; // Exit once we've found our match.
-                }
-            }
-        }
-    }
+                 // Fetch content from E column for heading and body copy.
+                 String headingcontent=sourcedatarow.Getcell(4)!=null?sourcedatarow.Getcell(4).Getstringcellvalue():""; 
+                 modulrow.Createcell(sgencolumnindex).Setcellvalue(headingcontent); 
 
-    private static String getStringFromSource(Row row, int columnIdx) {
-        Cell cellInSourceDataColumnE = row.getCell(columnIdx);
-        return cellInSourceDataColumnE != null ? cellInSourceDataColumnE.toString() : "";
-    }
+                 break; 
 
-    private static int findModuleRow(Sheet sheet, String value, int columnIdx) {
-        for (int i = 1; i <= sheet.getLastRowNum(); i++) { 
-            Row rowInMasterModulesColumnA=sheet.getrow(i); 
-            if(rowInMasterModulesColumnA!=null){ 
-              Cell cell=rowInMasterModulesColumnA.Getcell(columnIdx); 
-              if(cell!=null&&cell.Getstringcellvalue().equalsIgnoreCase(value)){ 
+             } 
+
+          } 
+
+       } 
+
+   }
+
+   private static int findModuleByName(Sheet sheet,String value){
+       for(int i=0;i<=sheet.Getlastrownum();i++){ 
+          Row row=sheet.Getrow(i); 
+          if(row!=null){ 
+             Cell cell=row.Getcell(0); 
+
+             if(cell!=null&&cell.Getstringcellvalue().equalsIgnoreCase(value)){ 
+
                  return i; 
-              } 
-           } 
-         } 
-         return -1; 
-     } 
+
+             } 
+
+          } 
+
+       } 
+
+       return-1; 
+
+   }
+
 }
