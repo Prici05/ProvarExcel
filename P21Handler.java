@@ -10,79 +10,62 @@ public class P21Handler {
         int masterModulesColIndex = ExcelUtils.getColumnIndex(sheet, "Master_Modules");
         int masterElementsColIndex = ExcelUtils.getColumnIndex(sheet, "Master_Elements");
         
+        String moduleValue = "P2.1.1 - Left aligned primary copy module with background colour options";
         
-        String moduleValue ="P2.1.1 - Left aligned primary copy module with background colour options";
+        int moduleRowIndex = findModuleByName(sheet, moduleValue);
+
+        if (moduleRowIndex != -1 && masterElementsColIndex != -1) {
+            Row moduleRow = sheet.getRow(moduleRowIndex);
+            Cell headingCell = moduleRow.createCell(masterElementsColIndex);
+            headingCell.setCellValue("heading");
+
+            // Shift rows below the P2.1.1 row down by two positions to make room for body copy and CTA button.
+            sheet.shiftRows(moduleRowIndex + 1, sheet.getLastRowNum(), 2);
+
+            Row bodyCopyRow = sheet.createRow(moduleRowIndex + 1);
+            bodyCopyRow.createCell(masterElementsColIndex).setCellValue("bodycopy");
+
+            Row ctaButtonRow = sheet.createRow(moduleRowIndex + 2);
+            ctaButtonRow.createCell(masterElementsColIndex).setCellValue("CTAbutton");
+
+            populateP21Content(sourceWorkbook, moduleValue, moduleRow);
+        }
+    }
+
+    private static void populateP21Content(Workbook sourceWorkbook, String moduleValue, Row moduleRow) {
+        Sheet sourceSheet = sourceWorkbook.getSheet("EMAIL 1");
         
-        int moduleRowIndex= findModuleByName(sheet,moduleValue);
-     
+        for (int i = 5; i <= sourceSheet.getLastRowNum(); i++) { 
+            Row sourceDataRow = sourceSheet.getRow(i); 
+            if (sourceDataRow != null) { 
+                Cell moduleNameInSourceData = sourceDataRow.getCell(0); 
 
-       if(moduleRowIndex!=-1 && masterElementsColIndex!=-1){
-           Row modulrow=sheet.getRow(moduleRowIndex);
-           Cell headingcell=modulrow.createCell(masterElementsColIndex);
-           headingcell.setCellValue("heading");
+                if (moduleNameInSourceData != null && 
+                    moduleNameInSourceData.getStringCellValue().equalsIgnoreCase(moduleValue)) { 
 
-           // Shift rows below the P2.1.1 row down by two positions to make room for body copy and CTA button.
-           sheet.shiftRows(moduleRowIndex+1,sheet.getLastRowNum(),2);
+                    // Fetch content from E column for heading and body copy.
+                    String headingContent = sourceDataRow.getCell(4) != null ? 
+                        sourceDataRow.getCell(4).getStringCellValue() : ""; 
+                    moduleRow.createCell(masterElementsColIndex).setCellValue(headingContent); 
 
-           Row bodycopyrow=sheet.createRow(moduleRowIndex+1);
-           bodycopyrow.createCell(masterElementsColIndex).setCellValue("bodycopy");
+                    break; 
+                } 
+            } 
+        } 
+    }
 
-           Row ctbuttonrow=sheet.createRow(moduleRowIndex+2);
-           ctbuttonrow.createCell(masterElementsColIndex).setCellValue("CTAbutton");
+    private static int findModuleByName(Sheet sheet, String value) {
+        for (int i = 0; i <= sheet.getLastRowNum(); i++) { 
+            Row row = sheet.getRow(i); 
+            if (row != null) { 
+                Cell cell = row.getCell(0); 
 
-           populateP21Content(sourceWorkbook,moduleValue,modulrow, sheet);
+                if (cell != null && cell.getStringCellValue().equalsIgnoreCase(value)) { 
+                    return i; 
+                } 
+            } 
+        } 
 
-       }
-
-   }
-
-   private static void populateP21Content(Workbook sourceWorkbook,String moduleValue,Row modulrow, Sheet sheet){
-    
-       Sheet sourcesheet=sourceWorkbook.getSheet("EMAIL 1");
-       int sourceModulesColumnIndex = ExcelUtils.getColumnIndex(sourcesheet, "MODULES");
-       int sgEnContentColIndex = ExcelUtils.getColumnIndex(sheet, "SG-EN_Content");
-       
-       for(int i=1;i<=sourcesheet.getLastRowNum();i++){ 
-          Row sourcedatarow=sourcesheet.getRow(i); 
-          if(sourcedatarow!=null){ 
-             Cell modulenameinsourcedata=sourcedatarow.getCell(sourceModulesColumnIndex); 
-             System.out.println("**********" +modulenameinsourcedata);
-
-             if(modulenameinsourcedata!=null&&modulenameinsourcedata.getStringCellValue().equalsIgnoreCase(moduleValue)){ 
-
-                 // Fetch content from E column for heading and body copy.
-                 String headingcontent=sourcedatarow.getCell(4)!=null?sourcedatarow.getCell(4).getStringCellValue():""; 
-                 System.out.println("HEADING CONTENT " +headingcontent);
-                 modulrow.createCell(sgEnContentColIndex).setCellValue(headingcontent); 
-
-                 break; 
-
-             } 
-
-          } 
-
-       } 
-
-   }
-
-   private static int findModuleByName(Sheet sheet,String value){
-       for(int i=0;i<=sheet.getLastRowNum();i++){ 
-          Row row=sheet.getRow(i); 
-          if(row!=null){ 
-             Cell cell=row.getCell(0); 
-
-             if(cell!=null&&cell.getStringCellValue().equalsIgnoreCase(value)){ 
-
-                 return i; 
-
-             } 
-
-          } 
-
-       } 
-
-       return-1; 
-
-   }
-
+        return -1; 
+    }
 }
