@@ -16,6 +16,8 @@ public class Main {
             Workbook sourceWorkbook = new XSSFWorkbook(fis);
             ExcelUtils.createHeaders(workbook, sourceWorkbook);
             
+            // Handle each module
+            ModuleHandler.handleModules(workbook, sourceWorkbook);
             SubjectLineHandler.handleSubjectLine(workbook, sourceWorkbook);
             PreHeaderHandler.handlePreHeader(workbook, sourceWorkbook);
             P21Handler.handleP21(workbook, sourceWorkbook);
