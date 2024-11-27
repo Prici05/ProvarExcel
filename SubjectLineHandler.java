@@ -17,15 +17,14 @@ public class SubjectLineHandler {
                     Cell masterModuleCell = currentRow.getCell(masterModulesColIndex);
                     if (masterModuleCell != null && masterModuleCell.getCellType() == CellType.STRING 
                         && masterModuleCell.getStringCellValue().equalsIgnoreCase("Subject Line")) {
-                        
-                        // Find corresponding row in the source sheet
+
                         for (int j = 5; j <= sourceSheet.getLastRowNum(); j++) {
                             Row sourceRow = sourceSheet.getRow(j);
                             if (sourceRow != null) {
                                 Cell moduleCell = sourceRow.getCell(0); // Assuming MODULES is in column A (index 0)
                                 if (moduleCell != null && moduleCell.getCellType() == CellType.STRING 
                                     && moduleCell.getStringCellValue().equalsIgnoreCase("Subject Line")) {
-                                    
+
                                     Cell contentCell = sourceRow.getCell(4); // Assuming E column is index 4
                                     if (contentCell != null && contentCell.getCellType() == CellType.STRING) {
                                         Cell sgEnContentCell = currentRow.createCell(sgEnContentColIndex);
