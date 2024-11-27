@@ -8,27 +8,36 @@ public class P21Handler {
         Sheet sourceSheet = sourceWorkbook.getSheet("EMAIL 1");
 
         int masterModulesColIndex = ExcelUtils.getColumnIndex(sheet, "Master_Modules");
-        int masterElementsColIndex = ExcelUtils.getColumnIndex(sheet, "Master_Elements");
+        int sgEnContentColIndex = ExcelUtils.getColumnIndex(sheet, "SG-EN_Content");
         
         String moduleValue = "P2.1.1 - Left aligned primary copy module with background colour options";
         
-        int moduleRowIndex = findModuleByName(sheet, moduleValue);
+        if (masterModulesColIndex != -1 && sgEnContentColIndex != -1) {
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row currentRow = sheet.getRow(i);
+                if (currentRow != null) {
+                    Cell masterModuleCell = currentRow.getCell(masterModulesColIndex);
+                    if (masterModuleCell != null && masterModuleCell.getCellType() == CellType.STRING 
+                        && masterModuleCell.getStringCellValue().equalsIgnoreCase(moduleValue)) {
 
-        if (moduleRowIndex != -1 && masterElementsColIndex != -1) {
-            Row moduleRow = sheet.getRow(moduleRowIndex);
-            Cell headingCell = moduleRow.createCell(masterElementsColIndex);
-            headingCell.setCellValue("heading");
+                        // Create cells for heading, body copy, and CTA button
+                        Cell headingCell = currentRow.createCell(sgEnContentColIndex);
+                        headingCell.setCellValue("heading"); // Placeholder for heading
 
-            // Shift rows below the P2.1.1 row down by two positions to make room for body copy and CTA button.
-            sheet.shiftRows(moduleRowIndex + 1, sheet.getLastRowNum(), 2);
+                        // Shift rows below the current row down by two positions
+                        sheet.shiftRows(i + 1, sheet.getLastRowNum(), 2);
 
-            Row bodyCopyRow = sheet.createRow(moduleRowIndex + 1);
-            bodyCopyRow.createCell(masterElementsColIndex).setCellValue("bodycopy");
+                        Row bodyCopyRow = sheet.createRow(i + 1);
+                        bodyCopyRow.createCell(sgEnContentColIndex).setCellValue("bodycopy"); // Placeholder for body copy
 
-            Row ctaButtonRow = sheet.createRow(moduleRowIndex + 2);
-            ctaButtonRow.createCell(masterElementsColIndex).setCellValue("CTAbutton");
+                        Row ctaButtonRow = sheet.createRow(i + 2);
+                        ctaButtonRow.createCell(sgEnContentColIndex).setCellValue("CTAbutton"); // Placeholder for CTA button
 
-            populateP21Content(sourceWorkbook, moduleValue, moduleRow);
+                        populateP21Content(sourceWorkbook, moduleValue, currentRow);
+                        break; // Exit after processing the found module
+                    }
+                }
+            }
         }
     }
 
@@ -46,26 +55,11 @@ public class P21Handler {
                     // Fetch content from E column for heading and body copy.
                     String headingContent = sourceDataRow.getCell(4) != null ? 
                         sourceDataRow.getCell(4).getStringCellValue() : ""; 
-                    moduleRow.createCell(masterElementsColIndex).setCellValue(headingContent); 
+                    moduleRow.createCell(sgEnContentColIndex).setCellValue(headingContent); 
 
                     break; 
                 } 
             } 
         } 
-    }
-
-    private static int findModuleByName(Sheet sheet, String value) {
-        for (int i = 0; i <= sheet.getLastRowNum(); i++) { 
-            Row row = sheet.getRow(i); 
-            if (row != null) { 
-                Cell cell = row.getCell(0); 
-
-                if (cell != null && cell.getStringCellValue().equalsIgnoreCase(value)) { 
-                    return i; 
-                } 
-            } 
-        } 
-
-        return -1; 
     }
 }
