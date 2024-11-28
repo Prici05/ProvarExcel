@@ -1,3 +1,4 @@
+
 package com.example;
 
 import org.apache.poi.ss.usermodel.*;
@@ -9,6 +10,8 @@ public class SubjectLineHandler {
         
         int masterModulesColIndex = ExcelUtils.getColumnIndex(sheet, "Master_Modules");
         int sgEnContentColIndex = ExcelUtils.getColumnIndex(sheet, "SG-EN_Content");
+        int sourceModulesColumnIndex = ExcelUtils.getColumnIndex(sourceSheet, "MODULES");
+        
         
         if (masterModulesColIndex != -1 && sgEnContentColIndex != -1) {
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
@@ -21,7 +24,7 @@ public class SubjectLineHandler {
                         for (int j = 5; j <= sourceSheet.getLastRowNum(); j++) {
                             Row sourceRow = sourceSheet.getRow(j);
                             if (sourceRow != null) {
-                                Cell moduleCell = sourceRow.getCell(0); // Assuming MODULES is in column A (index 0)
+                                Cell moduleCell = sourceRow.getCell(sourceModulesColumnIndex); // Assuming MODULES is in column A (index 0)
                                 if (moduleCell != null && moduleCell.getCellType() == CellType.STRING 
                                     && moduleCell.getStringCellValue().equalsIgnoreCase("Subject Line")) {
 
