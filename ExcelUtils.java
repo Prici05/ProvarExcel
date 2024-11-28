@@ -1,3 +1,4 @@
+
 package com.example;
 
 import org.apache.poi.ss.usermodel.*;
@@ -57,13 +58,26 @@ public class ExcelUtils {
     }
 
     public static int getColumnIndex(Sheet sheet, String columnName) {
-        Row headerRow = sheet.getRow(0);
-        for (int col = 0; col < headerRow.getLastCellNum(); col++) {
-            Cell cell = headerRow.getCell(col);
-            if (cell != null && cell.getStringCellValue().equalsIgnoreCase(columnName)) {
-                return col;
+        // Iterate through all rows in the sheet
+        for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+            Row currentRow = sheet.getRow(rowIndex);
+            if (currentRow != null) {
+                // Iterate through all cells in the current row
+                for (int col = 0; col < currentRow.getLastCellNum(); col++) {
+                    Cell cell = currentRow.getCell(col);
+                    if (cell != null && cell.getCellType() == CellType.STRING &&
+                            cell.getStringCellValue().equalsIgnoreCase(columnName)) {
+                        return col; // Return the column index if found
+                    }
+                }
             }
         }
-        return -1; // Column not found
+        return -1; // Column not found in any row
     }
 }
+    
+
+
+
+
+
